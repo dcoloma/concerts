@@ -1,0 +1,38 @@
+CACHE MANIFEST
+# Mon Dec 16 20:59:08 UTC 2013
+
+
+# cache all of these
+CACHE:
+
+# auto-generated file list
+# *.html
+home.html
+app.json
+
+# js/*.js
+js/add2home.js
+js/async_storage.js
+js/bugzilla.js
+js/firebase.js
+js/jquery-1.9.0.min.js
+js/tracker.js
+
+# css/*.css
+css/add2home.css
+css/modern-responsive.css
+css/modern.css
+
+# images/*
+images/Firefox-all.png
+images/Firefox-develop.png
+images/Firefox-plan.png
+images/Firefox-stable.png
+
+# fonts/*
+fonts/iconFont.eot
+fonts/iconFont.svg
+fonts/iconFont.ttf
+fonts/iconFont.woff
+fonts/license.txt
+# end of auto-generated file list
