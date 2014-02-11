@@ -289,7 +289,8 @@
 	  }
 	}
 	catch(e){
-      console.log("Exception while retrieving coordinates " + e.message);  
+      console.log("Exception while retrieving coordinates " + e.message); 
+      displayError("Geocode was not successful for the following exception: " + e.message); 
       // XXX - Localize
       displayError("No coordinates have been found for that location");
     }
