@@ -275,7 +275,8 @@
             newPage = 1;           
 	        getGigs();
 	      } else {
-		      console.log("Geocode was not successful for the following reason: " + status);
+		      //console.log("Geocode was not successful for the following reason: " + status);
+          displayError("Geocode was not successful for the following reason: " + status);
           // XXX - Localize
           displayError("No coordinates have been found for the location");
         }
