@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# Mon Feb 10 18:26 UTC 2013
+# Mon Feb 11 01:31 UTC 2013
 
 
 # cache all of these
@@ -12,7 +12,7 @@ index.html
 # js/*.js
 scripts/ajax.js
 scripts/gigguide.js
-scripts/jquery-1.6.2.js
+scripts/jquery-1.6.2.min.js
 scripts/jquery.mobile-1.0b3.min.js
 
 # css/*.css
@@ -25,7 +25,7 @@ style/images/icons-36-black.png
 style/images/icons-36-white.png
 
 # images/*
-images/default.png
+images/default.jpg
 images/email.png
 images/sms.png
 images/twitter.png
