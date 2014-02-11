@@ -3,7 +3,6 @@
   "description": "Find which concerts are taking place close to where you are or a specific location.",
   "version": "0.01",
   "launch_path": "/concerts/index.html",
-  "appcache_path": "/concerts/application.appcache",
   "developer": {
     "name": "AppConcerts",
     "url": "https://twitter.com/appconcerts"
