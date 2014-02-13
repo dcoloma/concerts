@@ -1,0 +1,122 @@
+* {
+    -moz-box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  font-size: 62.5%; /* Setting base font to 10px and define all your units in rem. 1rem = 10px */
+}
+
+body {
+    background-color: #FFFFFF;
+    font-size: 1.4rem;
+    font-family: sans-serif,Verdana,Arial,serif;
+    margin: 0;
+    text-align: center;
+}
+
+#detailsPanel{
+    height: 100%;
+    padding: 0;
+}
+
+.panel {
+    color: #555555;
+    background-color: white;
+}
+
+#searchBox {
+    position: absolute;
+    top: 8rem;
+    width: 70%;
+    left: 2rem;
+}
+
+#locationButton {
+    position: absolute;
+    top: 8rem;
+    width: 10%;
+    right: 2rem;
+    border-radius: 1.5rem;
+    padding: 2rem;
+}
+
+#artistBox {
+    position: absolute;
+    top: 8rem;
+    width: 90%;
+    left: 2rem;
+}
+
+#listEventsArtist {
+    position: absolute;
+    top: 16rem;
+    width: 100%;
+    left: 0rem;
+    background-color: white;
+}
+
+#listEventsLocation {
+    position: absolute;
+    top: 16rem;
+    width: 100%;
+    left: 0rem;
+    background-color: white;
+}
+
+.modalDialog {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.3);
+    bottom: 0;
+    font-family: Arial,Helvetica,sans-serif;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    right: 0;
+    top: 0;
+    transition: opacity 400ms ease-in 0s;
+    z-index: 99999;
+    overflow: scroll;
+}
+.modalDialog:target {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 9999999;
+}
+
+.modalDialog > div {
+    background: none repeat scroll 0 0 #2C393B;
+    padding: 1rem 1rem 1rem;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.9;
+}
+
+.listItem{
+    postion: absolute;
+    left: 1rem;
+}
+
+#statusBanner {
+  margin-top: 7.5rem;
+  text-align: center;
+  z-index: 100000;
+}
+
+#statusBanner.hidden {
+  opacity: 0;
+  z-index: -10000;
+}
+
+#headerLocation{
+  background-color: black;
+  height: 20rem; 
+  width: 100%;
+}
+
+.listTopLine{
+    font-size: 8px;
+    color: orange;
+}

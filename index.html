@@ -1,85 +1,406 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" class="ui-mobile" manifest="application.appcache">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
-   <meta charset="utf-8"> 
-   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1"> 
-   <title>Concert Guide</title>
+  <title>Concert Guide</title>
 
-      <!-- Style to be applied -->
-	  <link rel="stylesheet" href="style/jquery.mobile-1.0b3.min.css" />
-      <!-- Scripts: order matters: 1st jquery, then your scripts, last jquerymobile -->
-      <script type="text/javascript" charset="utf-8" src="scripts/jquery-1.6.2.min.js"></script>
-      <script type="text/javascript" charset="utf-8" src="scripts/gigguide.js"></script>
-      <script type="text/javascript" charset="utf-8" src="scripts/ajax.js"></script>
+  <!--<script defer src="scripts/l10n.js" charset="utf-8"></script>
+  <link rel="resource" type="application/l10n" href="locales/locales.ini" />-->
+    <link href="style/base.css" rel="stylesheet" type="text/css">
+
+  <link href="bb/toolbars.css" rel="stylesheet" type="text/css">
+  <link href="bb/tabs.css" rel="stylesheet" type="text/css">
       <script type="text/javascript" charset="utf-8" src="http://maps.google.com/maps/api/js?sensor=true"></script>
-      <script type="text/javascript" charset="utf-8" src="scripts/jquery.mobile-1.0b3.min.js"></script>
-	</head>
-	<body onload="requestLocation()">
 
-    <!-- Start of first page -->       
-    <div data-role="page" id='mainPage' data-theme="c"> 
- 	    <div data-role="header" data-position="inline">
-          <h1>Concert Guide</h1>
-          <a href="javascript:requestLocation()" data-icon="refresh" data-iconpos="notext"></a>
-	    </div><!-- /header --> 
-        <p>
- 	      <div style="padding-left: 5px">
- 	      <form action="javascript:oncitysubmit();" name="cityform">
- 	          <div>
- 	             <input type="search" name="search"> 
- 	          </div>
- 	      </form>
-          </div>
-        </p>    
-        <div data-role="content" data-position="inline" style="padding-left: 5px">
-           <div id="eventList">
-             <ul data-role="listview" id="evList">
-             </ul>
-           </div>
-           <p>
-             <div id="plus" align=center>
-                 <a href='' data-role='button' data-icon='plus' data-inline='true' data-iconpos='notext' data-theme='c'></a>
-             </div>
-	       </p>
-        </div><!-- /content --> 
-	    <div data-role="footer" align=center> 
-          <p> Powered by 
-          <a href="http://www.last.fm/"><img src="http://cdn.last.fm/flatness/badges/lastfm_grey.gif" alt="Last.fm" border="0" width=60 height=25/></a>
-          </p> 
-	    </div><!-- /footer --> 
-    </div>
-    <!-- end of first page -->       
+  <link href="bb/icons/styles/action_icons.css" rel="stylesheet" type="text/css">
+  <link href="bb/icons/styles/settings_icons.css" rel="stylesheet" type="text/css">
+  <link href="bb/icons/styles/comms_icons.css" rel="stylesheet" type="text/css">
+  <link href="bb/buttons.css" rel="stylesheet" type="text/css">
+  <link href="bb/icons/styles/media_icons.css" rel="stylesheet" type="text/css">
+  <link href="bb/icons/styles/settings_icons.css" rel="stylesheet" type="text/css">
+  <link href="bb/action_menu.css" rel="stylesheet" type="text/css">
+  <link href="bb/input_areas.css" rel="stylesheet" type="text/css">
+  <link href="bb/headers.css" rel="stylesheet" type="text/css">
+  <link href="bb/lists.css" rel="stylesheet" type="text/css">
+  <link href="bb/confirm.css" rel="stylesheet" type="text/css">
+    <link href="bb/status.css" rel="stylesheet" type="text/css">
+
+  <script src="scripts/ajax.js"></script>
+
+<script>
+
+  // Global Attributes  
+  var userLat = 41.64; // user's current latitude or null if they searched by city
+  var userLng = -0.88; // user's current longitude or null if they searched by city
+  var radio=25; // radio de búsqueda en km
+  var amount=25;
+  var artist=""
+  var list = "";
+  var city = "";
+  var pages; // pages to be displayed for gig details
+  var tweets;
+  var mails;
+  var smss;
+
+    var baseUrl = "http://ws.audioscrobbler.com/2.0/?method=geo.getevents&api_key=a0794c9653eaeb2f94ad10bb53fc5ea8&format=json&distance=" + radio + "&limit=" + amount;
+    var baseUrlartist = "http://ws.audioscrobbler.com/2.0/?method=artist.getevents&api_key=a0794c9653eaeb2f94ad10bb53fc5ea8&format=json&autocorrect=1";
+
+  function showBanner(message)
+  {
+    document.getElementById("statusText").innerHTML = message;
+    document.getElementById("statusBanner").classList.remove('hidden');
+    setTimeout(function(){document.getElementById("statusBanner").classList.add('hidden')},5000);
+  }
+
+  function errorResponse(message)
+  {
+    console.log("error in AJAX request: " + message);
+    document.getElementById(list).innerHTML="";
+    showBanner("Error Requesting the concerts to last.fm (" + message +")")
+  }
+
+ function getGigsByArtist(e)
+ {
+   console.log("getGigsByArtist");
+   artist = document.getElementById("artistBox").value;
+   var key=e.keyCode || e.which;
+   if (key==13){
+     url = baseUrlartist + "&artist=" + encodeURI(artist);  
+     console.log("XXX " + url);
+     list = "listEventsArtist"
+     getGigs(url);
+   }
+ }
+
+ function getGigsByLocation(e)
+ {
+   console.log("getGigsByLocation");
+   city = document.getElementById("searchBox").value;
+   var key=e.keyCode || e.which;
+   if (key==13){
+     url = baseUrl + "&location=" + encodeURI(city);  
+     console.log("XXX " + url);
+     list = "listEventsLocation"
+     getGigs(url);
+   }
+ }
+
+function requestLocation(){
+    console.log("requestLocation")
+
+  try {
+
+    navigator.geolocation.getCurrentPosition(onposition, onpositionerror, {timeout:10000, maximumAge:120000});
+    }catch(e){
+      onpositionerror(e);
+    }
+  }
+
+
+  function onposition(position){
+    console.log("Location Retrieved Successfully: onposition");
+             
+    if(position != null){
+      userLat = position.coords.latitude;
+      userLng = position.coords.longitude;
+      console.log("With coordinates " + userLat + "," + userLng);
+      document.getElementById("searchBox").value = userLat + " , " + userLng;
+      // intentamos saber la correspodencia a localidad
+      // Pedimos los conciertos
+      url = baseUrl + "&lat=" + encodeURI(userLat) + "&long=" + encodeURI(userLng);
+      console.log("XXX " + url);
+      list = "listEventsLocation"
+      getGigs(url);
+      getAddressWithCoords(userLat, userLng)
+   }else{
+      // XXX - Localize
+      console.log("Your position could not be retrieved, please try it again or introduce manually your location.");
+      showBanner("Your position could not be retrieved, please try it again or introduce manually your location.");
+    }
+  }
+
+  function onpositionerror(e)
+  {
+    console.log("Error while retrieving location " + error.message);
+    showBanner("Your position could not be retrieved, please try it again or introduce it manually (" + error.message + ")");
+  }
+
+  function getAddressWithCoords(lat, lng)
+  {
+    var latlng = new google.maps.LatLng(lat, lng);
+    geocoder = new google.maps.Geocoder();              
+    try 
+    {      
+      geocoder.geocode({'latLng': latlng, 'language': 'es'}, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) 
+        {
+          console.log("Geocoding OK, location obtained ");
+          if (results[1]) 
+          {
+            console.log("Resultado " + results[2].formatted_address); 
+            document.getElementById("searchBox").value = results[2].formatted_address;
+            console.log("search box updated")
+            // var tokens = results[2].formatted_address.split(',',2);
+            //city = tokens[0];
+            //city = trim(city.replace(/[0-9]/g,''));
+            //console.log("The city is " + city);    
+          } 
+          else 
+          {
+            console.log("No address found");
+          }
+        } 
+        else 
+        {
+          console.log("Impossible retrieving locality for your current location - Error code: " + status);
+        }
+      });
+    }
+    catch(e)
+    {
+      console.log("Impossible retrieving locality for your current location - Error code: " + e.message);
+    }
+  }  
+
+ // Retrieves the content from last.fm for a particular page
+  function getGigs(url)
+  { 
+    console.log("getGigs with url " + url);
+    try 
+    {
+      url = url + encodeURI("&page=1");
+      console.log("URL request is " + url);
+      ajaxRequest(showGigs, errorResponse, {requestType:"GET", uri:url}, "JSON");
+    } 
+    catch (e) 
+    {
+      console.log("Request Error: " + e.message);
+      showBanner("Error retrieving the concerts (" + e.message +")");
+    }
+  }
     
-    <!-- Start of second page --> 
-    <div data-role="page" id="details" data-theme='c' data-add-back-button="true"> 
-	    <div data-role="header" data-position="fixed" data-add-back-button="true"> 
-		    <h1>Concert Details</h1> 
-      </div><!-- /header --> 
-      
-      <div data-role="content" id="detailsContent">
-      </div><!-- /content --> 
-      <div data-role="footer" align="center" data-position="fixed"> 
-        <div data-role="navbar" class="ui-navbar ui-navbar-noicons" role="navigation">
-          <ul class="ui-grid-a">
-            <li id="twitterButton">
-            </li>
-            <li id="smsButton">
-            </li>
-            <li id="mailButton">
-            </li>
-          </ul>
-        </div><!-- /navbar -->
-      </div><!-- /footer -->
-    </div><!-- /end of second page - gig details--> 
+  // Shows the events, to be called when the events have been retrieved
+  // the input argument (data) contains the json representation of the
+  // gigs received in the XHR
+  function showGigs(data)
+  {
+    console.log("showGigs")
+    // This is the current content of the event list
+    text = document.getElementById(list).innerHTML;
+    
+    // First we check if an error has occured
+    if((data.events == null) || (data.events.event == null))
+    {
+      console.log("ERROR while retrieving the gigs with code " + data.error + " and message " + data.message);
+      showBanner("No Concerts found, are you sure you typed the Band Name right?");
+      // XXX - Localize
+      document.getElementById(list).innerHTML = "";
+    }
+    else
+    {
+      var cont = 0; // Number of items parsed
+      text ="<ul>"; // clean-up the list
+      pages = new Array(); // every element content the text of the detailed page event
+      tweets = new Array(); // array for tweet pages
+      mails = new Array(); // array for emails pages
+      smss = new Array(); // array for sms pages
 
-    <div data-role="dialog" data-rel="dialog" id="errorMessage" data-theme='c' tabindex="0" class="ui-page ui-body-a ui-dialog" style="min-height: 341px; ">
-      <div data-role="header">
-        <h1> Error </h1>
-      </div><!-- /header -->
-      <div data-role="content">
-        <p><div id="errorText"> Error </div></p>
-      </div><!-- /content -->
-    </div><!-- /dialog -->
+      if (data.events.event.length == 0)
+      {
+        showBanner("No Concerts found, are you sure you typed the Band Name right?");
+        document.getElementById("list").innerHTML = "";
+      }
+
+      // For each event the list item is build
+      for (var i = 0; i < data.events.event.length; i++) 
+      {
+        // There are many images for every last.fm event, we need to identify 
+        // which to be used, the large image will be the preferred one
+        var images = data.events.event[i].image;
+        var imageToUse;
+      
+        for (var j = 0; j < images.length; ++j) 
+        {
+          imageToUse = images[j]["#text"];
+          if (images[j].size == "large") 
+            break;
+        }
+      
+        if (imageToUse == "")
+          imageToUse = "images/default.jpg";
+
+        // Process the date
+        var tokens = data.events.event[i].startDate.split(',',3);
+        var dayOfWeek = tokens[0];
+        var date = tokens[1];
+        tokens = date.split(' ');
+        var day = tokens[1];
+        var month = tokens[2];
+        var year = tokens[3];
+        var time = tokens[4];
+        tokens = time.split(":");
+        var hour = tokens[0];
+        var minute = tokens[1];
+           
+        // Name of the venue
+        var website = "<h3 align=center>" + data.events.event[i].venue.name + "</h3>";
+        // If there is a link to the website we include it
+        if (data.events.event[i].venue.website != "")
+           website = "<h3 align=center><a href='"+ 
+            data.events.event[i].venue.website + "' target='_blank'>" + 
+            data.events.event[i].venue.name + "</a></h3>";
+              
+        var address = "";
+            
+        if (data.events.event[i].venue.location.street != "")
+          address += data.events.event[i].venue.location.street + ", ";  
+          
+        // This is the text that will be included in the gig list  
+        text +="<li><aside class='pack-end'>"+
+          "<img alt='placeholder' src='" + imageToUse + "'/>" + "</aside>"+
+          "<a href='javascript:showDetails(" + cont + ")'>"+
+          "<p class='listItem listTopLine'>" + data.events.event[i].title + "</p>" +
+          "<p>" + day + " " + month + " " + year + "</p>" +
+          "<p>" + data.events.event[i].venue.name + " (" + 
+          data.events.event[i].venue.location.city + ")" + "</p>" + 
+          "</a></li>";   
+       
+        // For every event we also prepare the details page to be loaded if
+        // the user selects that event, and the content of the tweet and
+        // e-mail buttons
+        pages[cont] = "<h2 align='center'><a href='http://www.last.fm/event/" + 
+                      data.events.event[i].id +"' target='_blank'>" + data.events.event[i].title + 
+                      "</a></h2><h3 align='center'>" /*+ dayOfWeek + ", "*/ + day + " " + 
+                      month + " " + year + "</h3>" + website + "<p align=center>"+ 
+                      address + data.events.event[i].venue.location.city + ", " + 
+                      data.events.event[i].venue.location.country + 
+                      "</p><p align=center><a href='http://maps.google.com/?q=" + 
+                      data.events.event[i].venue.location["geo:point"]["geo:lat"] + 
+                      "," + data.events.event[i].venue.location["geo:point"]["geo:long"] + 
+                      "' target='_blank'><img align='center' src='http://maps.google.com/maps/api/staticmap?center=" + 
+                      data.events.event[i].venue.location["geo:point"]["geo:lat"] + 
+                      "," + data.events.event[i].venue.location["geo:point"]["geo:long"] +
+                      "&zoom=15&size=200x250&sensor=true&markers=color:blue%7Clabel:S%7C" +
+                      data.events.event[i].venue.location["geo:point"]["geo:lat"] + 
+                      "," + data.events.event[i].venue.location["geo:point"]["geo:long"] + 
+                      "'/></a></p><h4 align=center>" + data.events.event[i].description + "</h4>";
+  
+        // Summary of the event to be displayed in the list of events
+        var summary = encodeURI(data.events.event[i].artists.headliner + " in  " + 
+                      data.events.event[i].venue.location.city + 
+                      " (" + dayOfWeek + ", " + day + " " + month + ")");
+                                     
+        // For every event I will create a link to tweet it, when the tweet
+        // button is clicked, this link is used
+        // XXX - Localize
+        tweets[cont] = "javascript:window.open('http://twitter.com/share?text=" + 
+                       summary + "&url=" + encodeURI("http://www.last.fm/event/" + 
+                       data.events.event[i].id) + "&via=appconcerts', '_blank');";
+                  
+        mails[cont] = "javascript:window.open('mailto:?body=I discovered it through the FirefoxOS Concerts application. More details about the gig are available at " + 
+                      encodeURI("http://www.last.fm/event/"+data.events.event[i].id) + 
+                      "&subject=" + summary +"', '_blank');";
+
+        smss[cont] = "javascript:window.open('sms:?body=" + summary + ". I discovered it through the FirefoxOS Concerts application. More details about the gig available at " + 
+                      encodeURI("http://www.last.fm/event/"+ data.events.event[i].id) +"', '_blank')";
+
+        cont++;
+      }
+        
+      text += "</ul>";
+
+      // Replace the content of the lsit
+      document.getElementById(list).innerHTML = text;
+    } 
+    console.log("Exiting")
+  }
+
+  function showDetails(i)
+  {
+    document.getElementById("detailsPanel").innerHTML = pages[i];
+    document.getElementById("twitterButton").setAttribute("onclick", tweets[i]);
+    document.getElementById("smsButton").setAttribute("onclick", smss[i]);
+    document.getElementById("emailButton").setAttribute("onclick", mails[i]);
+    window.location.href = '#details';
+  }
+
+</script>
+
+
+</head>
+<body onload="javascript:document.getElementById('panel1').style.visibility='visible';
+        document.getElementById('panel1').style.display='inline-block';
+        document.getElementById('panel2').style.visibility='hidden';
+        document.getElementById('panel2').style.display='none';">
+
+<section class="skin-organic" role="region">
+  <header class="fixed">
+    <a href="#"><span class="icon icon-menu">refresh</span></a>
+    <h1 data-l10n-id="appName">Concert Guide </h1>
+  </header>
+
+<section role="status" class="hidden" id="statusBanner">
+  <p id="statusText"></p>
+</section>
+  
+
+  <article class="tab frame">
+    <div role="toolbar">
+      <ul role="tablist" data-items="2" class="bottom0">
+        <li><button class="comms-icon contacts-location" onclick="javascript:document.getElementById('panel1').style.visibility='visible';
+        document.getElementById('panel1').style.display='inline-block';
+        document.getElementById('panel2').style.visibility='hidden';
+        document.getElementById('panel2').style.display='none';">Search by Location</button></li>
+        <li><button class="comms-icon contacts-favorite" onclick="document.getElementById('panel2').style.visibility='visible';
+        document.getElementById('panel2').style.display='inline-block';
+        document.getElementById('panel1').style.visibility='hidden';
+        document.getElementById('panel1').style.display='none';">Search by Artist</button></li>
+      </ul>
+    </div>
+  </article>
+
+
+
+  <article class="panel content scrollable header" id="panel1">
+    <section id="headerLocation">
+    <input type="text" placeholder="Your Location" id="searchBox" onkeypress="javascript:getGigsByLocation(event)">
+    <button class="comms-icon contacts-location" id="locationButton" onclick="javascript:requestLocation()"></button>
+    </section>
+    <section data-type="list" class="view-body article-list" id="listEventsLocation">
+    </section>
+  </article>
+  <article class="panel content scrollable header" id="panel2">
+    <input type="text" placeholder="Artist" id="artistBox" onkeypress="javascript:getGigsByArtist(event)">
+    <section data-type="list" class="view-body article-list" id="listEventsArtist">
+    </section>
+  </article>
+
+</section>
+
+  <div id="details" class="modalDialog">
+
+  <section class="skin-organic" role="region">
+  <header class="fixed">
+    <a href="#"><span class="icon icon-close">close</span></a>
+    <h1 data-l10n-id="appName">Concert Details </h1>
+  </header>
+  <article class="tab frame">
+    <div role="toolbar">
+    <ul>
+      <li><button class="comms-icon contacts-twitter" id="twitterButton"></button></li>
+      <li><button class="comms-icon contacts-sms" id="smsButton"></button></li>
+      <li><button class="comms-icon contacts-email" id="emailButton"></button></li>
+    </ul>
+
+    </div>
+  </article>
+
+ <article class="panel content scrollable header" id="detailsPanel">
+  </article>
+
+  </div>
+
+
 
 </body>
 </html>

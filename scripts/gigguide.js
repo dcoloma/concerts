@@ -13,11 +13,13 @@
   var tweets;
   var mails;
   var smss;
+  var artist = "Queens of Stone Age"
 
    // Configuration Data
   var radio = "25"; // radio de búsqueda en km
   var amount = 30; // number of gigs per page
   var baseUrl = "http://ws.audioscrobbler.com/2.0/?method=geo.getevents&api_key=a0794c9653eaeb2f94ad10bb53fc5ea8&format=json&distance=" + radio + "&limit=" + amount;
+  var baseUrlartist = "http://ws.audioscrobbler.com/2.0/?method=artist.getevents&api_key=a0794c9653eaeb2f94ad10bb53fc5ea8&format=json&autocorrect=1";
 
   /* Method invoked when JQueryMobile is initialized*/
   $(document).bind("mobileinit", function(){
@@ -38,7 +40,8 @@
   function getGigs()
   {
     console.log("Entering in method getGigs with page " + newPage);
-    url = baseUrl + "&lat=" + encodeURI(userLat) + "&long=" + encodeURI(userLng);
+    //url = baseUrl + "&lat=" + encodeURI(userLat) + "&long=" + encodeURI(userLng);
+    url = baseUrl + "&artist=" + encodeURI(artist);
 
     // Display loading message
     // XXX - Localize
@@ -275,7 +278,8 @@
             newPage = 1;           
 	        getGigs();
 	      } else {
-		      console.log("Geocode was not successful for the following reason: " + status);
+		      //console.log("Geocode was not successful for the following reason: " + status);
+          displayError("Geocode was not successful for the following reason: " + status);
           // XXX - Localize
           displayError("No coordinates have been found for the location");
         }
@@ -288,7 +292,8 @@
 	  }
 	}
 	catch(e){
-      console.log("Exception while retrieving coordinates " + e.message);  
+      console.log("Exception while retrieving coordinates " + e.message); 
+      displayError("Geocode was not successful for the following exception: " + e.message); 
       // XXX - Localize
       displayError("No coordinates have been found for that location");
     }
