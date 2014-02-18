@@ -23,7 +23,7 @@
   <link href="bb/headers.css" rel="stylesheet" type="text/css">
   <link href="bb/lists.css" rel="stylesheet" type="text/css">
   <link href="bb/confirm.css" rel="stylesheet" type="text/css">
-    <link href="bb/status.css" rel="stylesheet" type="text/css">
+  <link href="bb/status.css" rel="stylesheet" type="text/css">
 
   <script src="scripts/ajax.js"></script>
 
@@ -72,26 +72,24 @@
    }
  }
 
- function getGigsByLocation(e)
- {
-   console.log("getGigsByLocation");
-   city = document.getElementById("searchBox").value;
-   var key=e.keyCode || e.which;
-   if (key==13){
-     url = baseUrl + "&location=" + encodeURI(city);  
-     console.log("XXX " + url);
-     list = "listEventsLocation"
-     getGigs(url);
-   }
- }
+  function getGigsByLocation(e)
+  {
+    console.log("getGigsByLocation");
+    city = document.getElementById("searchBox").value;
+    var key=e.keyCode || e.which;
+    if (key==13){
+      url = baseUrl + "&location=" + encodeURI(city);  
+      console.log("XXX " + url);
+      list = "listEventsLocation"
+      getGigs(url);
+    }
+  }
 
-function requestLocation(){
+  function requestLocation(){
     console.log("requestLocation")
-
-  try {
-
-    navigator.geolocation.getCurrentPosition(onposition, onpositionerror, {timeout:10000, maximumAge:120000});
-    }catch(e){
+    try {
+      navigator.geolocation.getCurrentPosition(onposition, onpositionerror, {timeout:10000, maximumAge:120000});
+    } catch(e) {
       onpositionerror(e);
     }
   }
@@ -121,8 +119,8 @@ function requestLocation(){
 
   function onpositionerror(e)
   {
-    console.log("Error while retrieving location " + error.message);
-    showBanner("Your position could not be retrieved, please try it again or introduce it manually (" + error.message + ")");
+    console.log("Error while retrieving location " + e.message);
+    showBanner("Your position could not be retrieved, please try it again or introduce it manually (" + e.message + ")");
   }
 
   function getAddressWithCoords(lat, lng)
@@ -243,12 +241,12 @@ function requestLocation(){
         var minute = tokens[1];
            
         // Name of the venue
-        var website = "<h3 align=center>" + data.events.event[i].venue.name + "</h3>";
+        var website = data.events.event[i].venue.name;
         // If there is a link to the website we include it
         if (data.events.event[i].venue.website != "")
-           website = "<h3 align=center><a href='"+ 
+           website = "<a href='"+ 
             data.events.event[i].venue.website + "' target='_blank'>" + 
-            data.events.event[i].venue.name + "</a></h3>";
+            data.events.event[i].venue.name + "</a>";
               
         var address = "";
             
@@ -270,8 +268,9 @@ function requestLocation(){
         // e-mail buttons
         pages[cont] = "<h2 align='center'><a href='http://www.last.fm/event/" + 
                       data.events.event[i].id +"' target='_blank'>" + data.events.event[i].title + 
-                      "</a></h2><h3 align='center'>" /*+ dayOfWeek + ", "*/ + day + " " + 
-                      month + " " + year + "</h3>" + website + "<p align=center>"+ 
+                      "</a> at " + website + " </h2>" +
+                      "<h3 align='center'>" /*+ dayOfWeek + ", "*/ + day + " " + 
+                      month + " " + year + "</h3>" + "<p align=center>"+ 
                       address + data.events.event[i].venue.location.city + ", " + 
                       data.events.event[i].venue.location.country + 
                       "</p><p align=center><a href='http://maps.google.com/?q=" + 
@@ -283,8 +282,14 @@ function requestLocation(){
                       "&zoom=15&size=200x250&sensor=true&markers=color:blue%7Clabel:S%7C" +
                       data.events.event[i].venue.location["geo:point"]["geo:lat"] + 
                       "," + data.events.event[i].venue.location["geo:point"]["geo:long"] + 
-                      "'/></a></p><h4 align=center>" + data.events.event[i].description + "</h4>";
-  
+                      "'/></a></p>";
+
+        /*if (data.events.event[i].description != "")
+        {
+                      pages[cont]+="<h4 align=center>" + data.events.event[i].description + "</h4>";
+        }*/
+
+
         // Summary of the event to be displayed in the list of events
         var summary = encodeURI(data.events.event[i].artists.headliner + " in  " + 
                       data.events.event[i].venue.location.city + 
@@ -299,10 +304,10 @@ function requestLocation(){
                   
         mails[cont] = "javascript:window.open('mailto:?body=I discovered it through the FirefoxOS Concerts application. More details about the gig are available at " + 
                       encodeURI("http://www.last.fm/event/"+data.events.event[i].id) + 
-                      "&subject=" + summary +"', '_blank');";
+                      "&subject=" + summary +"');";
 
         smss[cont] = "javascript:window.open('sms:?body=" + summary + ". I discovered it through the FirefoxOS Concerts application. More details about the gig available at " + 
-                      encodeURI("http://www.last.fm/event/"+ data.events.event[i].id) +"', '_blank')";
+                      encodeURI("http://www.last.fm/event/"+ data.events.event[i].id) +"')";
 
         cont++;
       }
