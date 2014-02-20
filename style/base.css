@@ -27,55 +27,35 @@ body {
   text-align: center;
 }
 
-#detailsPanel {
-    height: 100%;
-    padding: 0;
+#main-page-location-view-button {
     position: absolute;
-    width: 100%;
-}
-
-.panel {
-    color: #555555;
-    background-color: white;
-}
-
-#searchBox {
-    position: absolute;
-    top: 8rem;
-    width: 70%;
-    left: 2rem;
-}
-
-#locationButton {
-    position: absolute;
-    top: 8rem;
+    top: 6rem;
     width: 10%;
     right: 2rem;
     border-radius: 1.5rem;
     padding: 2rem;
 }
 
-#artistBox {
+.main-page-searchbox{
     position: absolute;
-    top: 8rem;
-    width: 90%;
+    top: 6rem;
     left: 2rem;
 }
 
-#listEventsArtist {
-    position: absolute;
-    top: 16rem;
-    width: 100%;
-    left: 0rem;
-    background-color: white;
+#main-page-location-view-searchbox {
+    width: 70%;
 }
 
-#listEventsLocation {
+#main-page-artist-view-searchbox{
+    width: 90%;
+}
+
+.main-page-event-list{
     position: absolute;
-    top: 16rem;
+    top: 12rem;
     width: 100%;
     left: 0rem;
-    background-color: white;
+    background-color: #EAEAE7;
 }
 
 .modalDialog {
@@ -108,29 +88,26 @@ body {
     opacity: 0.9;
 }
 
-.listItem{
-    postion: absolute;
-    left: 1rem;
+#details-page-panel {
+    height: 100%;
+    padding: 0;
+    position: absolute;
+    width: 100%;
+    background-color: white;
 }
 
-#statusBanner {
+
+
+#status-banner{
   margin-top: 7.5rem;
   text-align: center;
   z-index: 100000;
 }
 
-#statusBanner.hidden {
+#status-banner.hidden {
   opacity: 0;
   z-index: -10000;
 }
 
-#headerLocation {
-    background-color: #F4F4F4;
-    height: 11rem;
-    width: 100%;
-}
 
-.listTopLine{
-    font-size: 8px;
-    color: orange;
-}
+

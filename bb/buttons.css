@@ -256,3 +256,8 @@ body[role="application"] .button input {
 .button.icon select {
    width: 130%;
 }
+
+button.comms-icon:before, a.comms-icon[role="button"]:before {
+    left: 0.5rem;
+    top: 0.5rem;
+}
